@@ -1,0 +1,2647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceHub - Professional Stock Market Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0a0e1a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: #1a202c;
+            border-bottom: 1px solid #2d3748;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #00d4aa;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #00d4aa, #0099cc);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #cbd5e0;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #00d4aa;
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        .market-ticker {
+            background: #1a202c;
+            border-bottom: 1px solid #2d3748;
+            padding: 0.75rem 0;
+            overflow: hidden;
+        }
+
+        .ticker-content {
+            display: flex;
+            animation: scroll 30s linear infinite;
+            gap: 3rem;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .ticker-symbol {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .ticker-price {
+            color: #00d4aa;
+        }
+
+        .ticker-change.positive {
+            color: #48bb78;
+        }
+
+        .ticker-change.negative {
+            color: #f56565;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #00d4aa, #0099cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .search-section {
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .market-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #48bb78;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            max-width: 600px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00d4aa;
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #718096;
+        }
+
+        .search-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #00d4aa, #0099cc);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 140px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 212, 170, 0.3);
+        }
+
+        .search-btn:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #a0aec0;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            background: rgba(245, 101, 101, 0.1);
+            color: #f56565;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+            border: 1px solid rgba(245, 101, 101, 0.2);
+        }
+
+        .demo-notice {
+            background: rgba(237, 137, 54, 0.1);
+            color: #ed8936;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+            border: 1px solid rgba(237, 137, 54, 0.2);
+            font-weight: 500;
+        }
+
+        .stock-overview {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stock-main {
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .stock-info h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+
+        .stock-name {
+            color: #a0aec0;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stock-exchange {
+            color: #718096;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .stock-price-section {
+            text-align: right;
+        }
+
+        .stock-price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stock-change {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .positive {
+            color: #48bb78;
+        }
+
+        .negative {
+            color: #f56565;
+        }
+
+        .change-arrow {
+            font-size: 0.8rem;
+        }
+
+        .stock-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .metric {
+            background: #2d3748;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #4a5568;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .stock-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-card {
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .key-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #a0aec0;
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .chart-section {
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .time-btn {
+            padding: 0.5rem 1rem;
+            background: #2d3748;
+            color: #a0aec0;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-btn.active,
+        .time-btn:hover {
+            background: #00d4aa;
+            color: white;
+            border-color: #00d4aa;
+        }
+
+        .last-updated {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        /* New styles for additional pages */
+        .page-header {
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-description {
+            color: #a0aec0;
+            font-size: 1rem;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .content-card {
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .content-card:hover {
+            border-color: #00d4aa;
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .card-content {
+            color: #a0aec0;
+            line-height: 1.6;
+        }
+
+        .watchlist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #2d3748;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #4a5568;
+        }
+
+        .watchlist-symbol {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .watchlist-name {
+            color: #a0aec0;
+            font-size: 0.9rem;
+        }
+
+        .watchlist-price {
+            text-align: right;
+        }
+
+        .news-item {
+            padding: 1.5rem;
+            background: #2d3748;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #4a5568;
+        }
+
+        .news-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-summary {
+            color: #a0aec0;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #00d4aa, #0099cc);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 212, 170, 0.3);
+        }
+
+        .remove-btn {
+            background: #f56565;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: #e53e3e;
+        }
+
+        /* Tool Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #2d3748;
+            color: #e2e8f0;
+        }
+
+        .tool-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            color: #e2e8f0;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            padding: 0.75rem 1rem;
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00d4aa;
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+        }
+
+        .form-select {
+            padding: 0.75rem 1rem;
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #00d4aa, #0099cc);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 212, 170, 0.3);
+        }
+
+        .result-section {
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #a0aec0;
+            font-size: 0.9rem;
+        }
+
+        .result-value {
+            color: #00d4aa;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .stock-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .stock-sidebar {
+                order: -1;
+            }
+
+            .stock-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .nav-content {
+                padding: 0 1rem;
+                height: auto;
+                min-height: 70px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .logo {
+                font-size: 1.3rem;
+            }
+
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .market-ticker {
+                padding: 0.5rem 0;
+            }
+
+            .ticker-item {
+                font-size: 0.8rem;
+                gap: 0.3rem;
+            }
+
+            .hero-section {
+                padding: 2rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+                margin-bottom: 0.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .search-section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .search-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .search-title {
+                font-size: 1.1rem;
+            }
+
+            .market-status {
+                font-size: 0.8rem;
+            }
+
+            .search-form {
+                flex-direction: column;
+                max-width: none;
+            }
+
+            .search-input {
+                padding: 0.9rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .search-btn {
+                padding: 0.9rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .stock-main {
+                padding: 1.5rem;
+            }
+
+            .stock-header {
+                flex-direction: column;
+                text-align: left;
+                gap: 1.5rem;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+            }
+
+            .stock-info h2 {
+                font-size: 1.6rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .stock-name {
+                font-size: 0.9rem;
+            }
+
+            .stock-exchange {
+                font-size: 0.8rem;
+            }
+
+            .stock-price-section {
+                text-align: left;
+            }
+
+            .stock-price {
+                font-size: 2.2rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .stock-change {
+                font-size: 1rem;
+            }
+
+            .stock-metrics {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .metric {
+                padding: 1rem;
+            }
+
+            .metric-label {
+                font-size: 0.8rem;
+            }
+
+            .metric-value {
+                font-size: 1.2rem;
+            }
+
+            .sidebar-card {
+                padding: 1rem;
+            }
+
+            .sidebar-title {
+                font-size: 1rem;
+                margin-bottom: 0.8rem;
+            }
+
+            .stat-row {
+                padding: 0.4rem 0;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
+            }
+
+            .stat-value {
+                font-size: 0.9rem;
+            }
+
+            .chart-section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+                padding-bottom: 0.8rem;
+            }
+
+            .chart-title {
+                font-size: 1.2rem;
+            }
+
+            .chart-controls {
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .time-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+            .last-updated {
+                font-size: 0.8rem;
+                margin-top: 0.8rem;
+            }
+
+            .demo-notice {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+                margin: 0.8rem 0;
+            }
+
+            .error-message {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .loading {
+                padding: 1.5rem;
+                font-size: 1rem;
+            }
+
+            .page-header {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .content-card {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .modal-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .stock-price {
+                font-size: 1.8rem;
+            }
+
+            .stock-change {
+                font-size: 0.9rem;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .ticker-content {
+                gap: 2rem;
+            }
+
+            .ticker-item {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo" data-page="markets">
+                <div class="logo-icon">F</div>
+                FinanceHub
+            </div>
+            <ul class="nav-links">
+                <li><a data-page="markets" class="nav-link active">Markets</a></li>
+                <li><a data-page="portfolio" class="nav-link">Portfolio</a></li>
+                <li><a data-page="watchlist" class="nav-link">Watchlist</a></li>
+                <li><a data-page="news" class="nav-link">News</a></li>
+                <li><a data-page="research" class="nav-link">Research</a></li>
+                <li><a data-page="tools" class="nav-link">Tools</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="market-ticker">
+        <div class="ticker-content">
+            <div class="ticker-item">
+                <span class="ticker-symbol">S&P 500</span>
+                <span class="ticker-price">4,567.89</span>
+                <span class="ticker-change positive">+0.85%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-symbol">NASDAQ</span>
+                <span class="ticker-price">14,234.56</span>
+                <span class="ticker-change positive">+1.23%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-symbol">DOW</span>
+                <span class="ticker-price">34,567.12</span>
+                <span class="ticker-change negative">-0.45%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-symbol">VIX</span>
+                <span class="ticker-price">18.45</span>
+                <span class="ticker-change negative">-2.34%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-symbol">GOLD</span>
+                <span class="ticker-price">$1,987.45</span>
+                <span class="ticker-change positive">+0.67%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-symbol">OIL</span>
+                <span class="ticker-price">$78.92</span>
+                <span class="ticker-change positive">+1.45%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Markets Page -->
+        <div id="markets" class="page-section active">
+            <div class="hero-section">
+                <h1 class="hero-title">Professional Market Analytics</h1>
+                <p class="hero-subtitle">Access real-time market data, advanced charting tools, and comprehensive financial analysis for informed investment decisions.</p>
+            </div>
+
+            <div class="demo-notice">
+                📊 Demo Platform: This application uses simulated market data for demonstration purposes. Professional trading requires real-time data feeds and proper risk management.
+            </div>
+
+            <div class="search-section">
+                <div class="search-header">
+                    <h2 class="search-title">Stock Quote Lookup</h2>
+                    <div class="market-status">
+                        <div class="status-dot"></div>
+                        <span>Market Open</span>
+                    </div>
+                </div>
+                <form class="search-form" id="stockForm">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="stockSymbol" 
+                        placeholder="Enter ticker symbol (AAPL, TSLA, GOOGL, MSFT, AMZN)"
+                        required
+                    >
+                    <button type="submit" class="search-btn" id="searchBtn">
+                        Get Quote
+                    </button>
+                </form>
+            </div>
+
+            <div id="loadingIndicator" class="loading" style="display: none;">
+                📈 Fetching market data...
+            </div>
+
+            <div id="errorContainer"></div>
+            <div id="stockContainer"></div>
+            <div id="chartContainer"></div>
+        </div>
+
+        <!-- Portfolio Page -->
+        <div id="portfolio" class="page-section">
+            <div class="page-header">
+                <h1 class="page-title">Portfolio Overview</h1>
+                <p class="page-description">Track your investments and monitor portfolio performance</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3 class="card-title">Portfolio Value</h3>
+                    <div class="card-content">
+                        <div style="font-size: 2rem; font-weight: 700; color: #48bb78; margin-bottom: 0.5rem;">$127,543.89</div>
+                        <div style="color: #48bb78;">+$2,341.23 (+1.87%) Today</div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Holdings</h3>
+                    <div class="card-content">
+                        <div class="watchlist-item">
+                            <div>
+                                <div class="watchlist-symbol">AAPL</div>
+                                <div class="watchlist-name">50 shares</div>
+                            </div>
+                            <div class="watchlist-price">
+                                <div style="color: #e2e8f0;">$8,771.50</div>
+                                <div style="color: #48bb78; font-size: 0.9rem;">+1.24%</div>
+                            </div>
+                        </div>
+                        <div class="watchlist-item">
+                            <div>
+                                <div class="watchlist-symbol">TSLA</div>
+                                <div class="watchlist-name">25 shares</div>
+                            </div>
+                            <div class="watchlist-price">
+                                <div style="color: #e2e8f0;">$6,221.75</div>
+                                <div style="color: #f56565; font-size: 0.9rem;">-2.06%</div>
+                            </div>
+                        </div>
+                        <div class="watchlist-item">
+                            <div>
+                                <div class="watchlist-symbol">MSFT</div>
+                                <div class="watchlist-name">30 shares</div>
+                            </div>
+                            <div class="watchlist-price">
+                                <div style="color: #e2e8f0;">$11,365.50</div>
+                                <div style="color: #48bb78; font-size: 0.9rem;">+1.15%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Performance</h3>
+                    <div class="card-content">
+                        <div class="stat-row">
+                            <span class="stat-label">1 Day</span>
+                            <span class="stat-value positive">+1.87%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">1 Week</span>
+                            <span class="stat-value positive">+3.42%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">1 Month</span>
+                            <span class="stat-value positive">+8.91%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">YTD</span>
+                            <span class="stat-value positive">+24.67%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Watchlist Page -->
+        <div id="watchlist" class="page-section">
+            <div class="page-header">
+                <h1 class="page-title">My Watchlist</h1>
+                <p class="page-description">Monitor your favorite stocks and track market movements</p>
+            </div>
+
+            <div class="content-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 class="card-title" style="margin-bottom: 0;">Watched Stocks</h3>
+                    <button class="add-btn" onclick="addToWatchlist()">+ Add Stock</button>
+                </div>
+                
+                <div id="watchlistContainer">
+                    <div class="watchlist-item">
+                        <div>
+                            <div class="watchlist-symbol">AAPL</div>
+                            <div class="watchlist-name">Apple Inc.</div>
+                        </div>
+                        <div class="watchlist-price">
+                            <div style="color: #e2e8f0;">$175.43</div>
+                            <div style="color: #48bb78; font-size: 0.9rem;">+1.24%</div>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromWatchlist(this)">Remove</button>
+                    </div>
+                    
+                    <div class="watchlist-item">
+                        <div>
+                            <div class="watchlist-symbol">TSLA</div>
+                            <div class="watchlist-name">Tesla, Inc.</div>
+                        </div>
+                        <div class="watchlist-price">
+                            <div style="color: #e2e8f0;">$248.87</div>
+                            <div style="color: #f56565; font-size: 0.9rem;">-2.06%</div>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromWatchlist(this)">Remove</button>
+                    </div>
+                    
+                    <div class="watchlist-item">
+                        <div>
+                            <div class="watchlist-symbol">GOOGL</div>
+                            <div class="watchlist-name">Alphabet Inc.</div>
+                        </div>
+                        <div class="watchlist-price">
+                            <div style="color: #e2e8f0;">$138.21</div>
+                            <div style="color: #48bb78; font-size: 0.9rem;">+1.37%</div>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromWatchlist(this)">Remove</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- News Page -->
+        <div id="news" class="page-section">
+            <div class="page-header">
+                <h1 class="page-title">Financial News</h1>
+                <p class="page-description">Stay updated with the latest market news and analysis</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="news-item">
+                    <h3 class="news-title">Federal Reserve Signals Potential Rate Changes</h3>
+                    <p class="news-summary">The Federal Reserve indicated possible adjustments to interest rates following recent economic data showing mixed signals in inflation and employment metrics.</p>
+                    <div class="news-meta">
+                        <span>Reuters</span>
+                        <span>2 hours ago</span>
+                    </div>
+                </div>
+
+                <div class="news-item">
+                    <h3 class="news-title">Tech Stocks Rally on AI Optimism</h3>
+                    <p class="news-summary">Major technology companies saw significant gains as investors remain bullish on artificial intelligence developments and their potential impact on future earnings.</p>
+                    <div class="news-meta">
+                        <span>Bloomberg</span>
+                        <span>4 hours ago</span>
+                    </div>
+                </div>
+
+                <div class="news-item">
+                    <h3 class="news-title">Energy Sector Volatility Continues</h3>
+                    <p class="news-summary">Oil prices fluctuated amid geopolitical tensions and changing supply dynamics, affecting energy sector stocks across global markets.</p>
+                    <div class="news-meta">
+                        <span>Financial Times</span>
+                        <span>6 hours ago</span>
+                    </div>
+                </div>
+
+                <div class="news-item">
+                    <h3 class="news-title">Cryptocurrency Market Shows Mixed Signals</h3>
+                    <p class="news-summary">Digital assets displayed varied performance as regulatory clarity improves in some regions while uncertainty persists in others.</p>
+                    <div class="news-meta">
+                        <span>CoinDesk</span>
+                        <span>8 hours ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Research Page -->
+        <div id="research" class="page-section">
+            <div class="page-header">
+                <h1 class="page-title">Investment Research</h1>
+                <p class="page-description">Access professional analysis and research reports</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3 class="card-title">Analyst Recommendations</h3>
+                    <div class="card-content">
+                        <div class="stat-row">
+                            <span class="stat-label">AAPL</span>
+                            <span class="stat-value positive">Strong Buy</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">TSLA</span>
+                            <span class="stat-value">Hold</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">GOOGL</span>
+                            <span class="stat-value positive">Buy</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">MSFT</span>
+                            <span class="stat-value positive">Strong Buy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Sector Analysis</h3>
+                    <div class="card-content">
+                        <p>Technology sector continues to show strong fundamentals with robust earnings growth expected in Q4. Key drivers include AI adoption, cloud computing expansion, and digital transformation initiatives.</p>
+                        <br>
+                        <p>Healthcare sector presents mixed outlook with regulatory changes and drug pricing pressures offset by innovation in biotechnology and medical devices.</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Market Outlook</h3>
+                    <div class="card-content">
+                        <p>Current market conditions suggest cautious optimism with several key factors to monitor:</p>
+                        <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                            <li>Federal Reserve policy decisions</li>
+                            <li>Inflation trends and economic indicators</li>
+                            <li>Geopolitical developments</li>
+                            <li>Corporate earnings growth</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Risk Assessment</h3>
+                    <div class="card-content">
+                        <div class="stat-row">
+                            <span class="stat-label">Market Volatility</span>
+                            <span class="stat-value" style="color: #ed8936;">Moderate</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Credit Risk</span>
+                            <span class="stat-value positive">Low</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Liquidity Risk</span>
+                            <span class="stat-value positive">Low</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Inflation Risk</span>
+                            <span class="stat-value" style="color: #ed8936;">Moderate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tools Page -->
+        <div id="tools" class="page-section">
+            <div class="page-header">
+                <h1 class="page-title">Financial Tools</h1>
+                <p class="page-description">Professional calculators and analysis tools for investment planning</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3 class="card-title">Portfolio Analyzer</h3>
+                    <div class="card-content">
+                        <p>Analyze your portfolio's risk-return profile, diversification, and performance metrics against market benchmarks.</p>
+                        <button class="add-btn" style="margin-top: 1rem;" onclick="launchTool('portfolio')">Launch Tool</button>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Options Calculator</h3>
+                    <div class="card-content">
+                        <p>Calculate option prices, Greeks, and analyze potential profit/loss scenarios for various options strategies.</p>
+                        <button class="add-btn" style="margin-top: 1rem;" onclick="launchTool('options')">Launch Tool</button>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Dividend Calculator</h3>
+                    <div class="card-content">
+                        <p>Project dividend income, calculate yield on cost, and analyze dividend growth patterns over time.</p>
+                        <button class="add-btn" style="margin-top: 1rem;" onclick="launchTool('dividend')">Launch Tool</button>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Risk Assessment</h3>
+                    <div class="card-content">
+                        <p>Evaluate portfolio risk using Value at Risk (VaR), beta analysis, and correlation matrices.</p>
+                        <button class="add-btn" style="margin-top: 1rem;" onclick="launchTool('risk')">Launch Tool</button>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Retirement Planner</h3>
+                    <div class="card-content">
+                        <p>Plan your retirement savings with compound interest calculations and withdrawal strategy analysis.</p>
+                        <button class="add-btn" style="margin-top: 1rem;" onclick="launchTool('retirement')">Launch Tool</button>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">Tax Optimizer</h3>
+                    <div class="card-content">
+                        <p>Optimize your investment strategy for tax efficiency with tax-loss harvesting and asset location analysis.</p>
+                        <button class="add-btn" style="margin-top: 1rem;" onclick="launchTool('tax')">Launch Tool</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tool Modals -->
+    <div id="toolModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Financial Tool</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody">
+                <!-- Tool content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced sample stock data with more financial metrics
+        const sampleStockData = {
+            'AAPL': {
+                symbol: 'AAPL',
+                name: 'Apple Inc.',
+                exchange: 'NASDAQ',
+                price: 175.43,
+                change: 2.15,
+                changePercent: 1.24,
+                volume: 52847392,
+                avgVolume: 58234567,
+                high: 176.80,
+                low: 173.25,
+                open: 174.12,
+                previousClose: 173.28,
+                marketCap: 2.78e12,
+                peRatio: 28.45,
+                eps: 6.16,
+                dividend: 0.96,
+                yield: 0.55,
+                week52High: 198.23,
+                week52Low: 124.17
+            },
+            'TSLA': {
+                symbol: 'TSLA',
+                name: 'Tesla, Inc.',
+                exchange: 'NASDAQ',
+                price: 248.87,
+                change: -5.23,
+                changePercent: -2.06,
+                volume: 89234567,
+                avgVolume: 95123456,
+                high: 255.10,
+                low: 247.50,
+                open: 252.34,
+                previousClose: 254.10,
+                marketCap: 7.89e11,
+                peRatio: 65.23,
+                eps: 3.81,
+                dividend: 0.00,
+                yield: 0.00,
+                week52High: 314.67,
+                week52Low: 101.81
+            },
+            'GOOGL': {
+                symbol: 'GOOGL',
+                name: 'Alphabet Inc.',
+                exchange: 'NASDAQ',
+                price: 138.21,
+                change: 1.87,
+                changePercent: 1.37,
+                volume: 28456789,
+                avgVolume: 31245678,
+                high: 139.45,
+                low: 136.80,
+                open: 137.23,
+                previousClose: 136.34,
+                marketCap: 1.75e12,
+                peRatio: 25.67,
+                eps: 5.38,
+                dividend: 0.00,
+                yield: 0.00,
+                week52High: 151.55,
+                week52Low: 83.34
+            },
+            'MSFT': {
+                symbol: 'MSFT',
+                name: 'Microsoft Corporation',
+                exchange: 'NASDAQ',
+                price: 378.85,
+                change: 4.32,
+                changePercent: 1.15,
+                volume: 31245678,
+                avgVolume: 28934567,
+                high: 380.20,
+                low: 375.60,
+                open: 376.45,
+                previousClose: 374.53,
+                marketCap: 2.82e12,
+                peRatio: 32.14,
+                eps: 11.79,
+                dividend: 2.72,
+                yield: 0.72,
+                week52High: 384.30,
+                week52Low: 213.43
+            },
+            'AMZN': {
+                symbol: 'AMZN',
+                name: 'Amazon.com, Inc.',
+                exchange: 'NASDAQ',
+                price: 145.67,
+                change: -2.18,
+                changePercent: -1.47,
+                volume: 45678901,
+                avgVolume: 42345678,
+                high: 148.90,
+                low: 144.25,
+                open: 147.23,
+                previousClose: 147.85,
+                marketCap: 1.51e12,
+                peRatio: 45.23,
+                eps: 3.22,
+                dividend: 0.00,
+                yield: 0.00,
+                week52High: 170.00,
+                week52Low: 81.43
+            }
+        };
+
+        let currentChart = null;
+
+        // Navigation functionality - FIXED VERSION
+        function showPage(pageId) {
+            console.log('Navigating to page:', pageId);
+            
+            // Hide all pages
+            const pages = document.querySelectorAll('.page-section');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                console.log('Successfully showed page:', pageId);
+            } else {
+                console.error('Page not found:', pageId);
+            }
+            
+            // Update navigation links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Initialize navigation system
+        function initializeNavigation() {
+            console.log('Initializing navigation system...');
+            
+            // Add click listeners to navigation links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    if (pageId) {
+                        showPage(pageId);
+                    }
+                });
+            });
+            
+            // Add click listener to logo
+            const logo = document.querySelector('.logo');
+            if (logo) {
+                logo.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showPage('markets');
+                });
+            }
+            
+            console.log('Navigation system initialized successfully');
+        }
+
+        // Watchlist functionality
+        function addToWatchlist() {
+            const symbol = prompt('Enter stock symbol to add to watchlist:');
+            if (symbol && sampleStockData[symbol.toUpperCase()]) {
+                const data = sampleStockData[symbol.toUpperCase()];
+                const container = document.getElementById('watchlistContainer');
+                const isPositive = data.change >= 0;
+                const changeClass = isPositive ? 'positive' : 'negative';
+                const changeSymbol = isPositive ? '+' : '';
+                
+                const newItem = document.createElement('div');
+                newItem.className = 'watchlist-item';
+                newItem.innerHTML = `
+                    <div>
+                        <div class="watchlist-symbol">${data.symbol}</div>
+                        <div class="watchlist-name">${data.name}</div>
+                    </div>
+                    <div class="watchlist-price">
+                        <div style="color: #e2e8f0;">$${data.price.toFixed(2)}</div>
+                        <div style="color: ${isPositive ? '#48bb78' : '#f56565'}; font-size: 0.9rem;">${changeSymbol}${data.changePercent.toFixed(2)}%</div>
+                    </div>
+                    <button class="remove-btn" onclick="removeFromWatchlist(this)">Remove</button>
+                `;
+                container.appendChild(newItem);
+            } else if (symbol) {
+                alert('Stock symbol not found. Available symbols: AAPL, TSLA, GOOGL, MSFT, AMZN');
+            }
+        }
+
+        function removeFromWatchlist(button) {
+            button.parentElement.remove();
+        }
+
+        // Tool launching functionality
+        function launchTool(toolType) {
+            const modal = document.getElementById('toolModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modal.classList.add('active');
+            
+            switch(toolType) {
+                case 'portfolio':
+                    modalTitle.textContent = 'Portfolio Analyzer';
+                    modalBody.innerHTML = createPortfolioAnalyzer();
+                    break;
+                case 'options':
+                    modalTitle.textContent = 'Options Calculator';
+                    modalBody.innerHTML = createOptionsCalculator();
+                    break;
+                case 'dividend':
+                    modalTitle.textContent = 'Dividend Calculator';
+                    modalBody.innerHTML = createDividendCalculator();
+                    break;
+                case 'risk':
+                    modalTitle.textContent = 'Risk Assessment Tool';
+                    modalBody.innerHTML = createRiskAssessment();
+                    break;
+                case 'retirement':
+                    modalTitle.textContent = 'Retirement Planner';
+                    modalBody.innerHTML = createRetirementPlanner();
+                    break;
+                case 'tax':
+                    modalTitle.textContent = 'Tax Optimizer';
+                    modalBody.innerHTML = createTaxOptimizer();
+                    break;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('toolModal').classList.remove('active');
+        }
+
+        // Tool creation functions
+        function createPortfolioAnalyzer() {
+            return `
+                <div class="tool-form">
+                    <div class="form-group">
+                        <label class="form-label">Portfolio Value ($)</label>
+                        <input type="number" class="form-input" id="portfolioValue" placeholder="100000" value="100000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Risk Tolerance</label>
+                        <select class="form-select" id="riskTolerance">
+                            <option value="conservative">Conservative</option>
+                            <option value="moderate" selected>Moderate</option>
+                            <option value="aggressive">Aggressive</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Investment Horizon (Years)</label>
+                        <input type="number" class="form-input" id="investmentHorizon" placeholder="10" value="10">
+                    </div>
+                    <button class="calculate-btn" onclick="calculatePortfolioAnalysis()">Analyze Portfolio</button>
+                    <div id="portfolioResults" class="result-section" style="display: none;">
+                        <h3 class="result-title">Analysis Results</h3>
+                        <div id="portfolioResultsContent"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createOptionsCalculator() {
+            return `
+                <div class="tool-form">
+                    <div class="form-group">
+                        <label class="form-label">Stock Price ($)</label>
+                        <input type="number" class="form-input" id="stockPrice" placeholder="100" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Strike Price ($)</label>
+                        <input type="number" class="form-input" id="strikePrice" placeholder="105" value="105">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Days to Expiration</label>
+                        <input type="number" class="form-input" id="daysToExpiration" placeholder="30" value="30">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Volatility (%)</label>
+                        <input type="number" class="form-input" id="volatility" placeholder="25" value="25">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Option Type</label>
+                        <select class="form-select" id="optionType">
+                            <option value="call">Call Option</option>
+                            <option value="put">Put Option</option>
+                        </select>
+                    </div>
+                    <button class="calculate-btn" onclick="calculateOptions()">Calculate Option Price</button>
+                    <div id="optionsResults" class="result-section" style="display: none;">
+                        <h3 class="result-title">Option Pricing</h3>
+                        <div id="optionsResultsContent"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createDividendCalculator() {
+            return `
+                <div class="tool-form">
+                    <div class="form-group">
+                        <label class="form-label">Number of Shares</label>
+                        <input type="number" class="form-input" id="numShares" placeholder="100" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Dividend per Share ($)</label>
+                        <input type="number" class="form-input" id="dividendPerShare" placeholder="2.50" value="2.50" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Dividend Growth Rate (%)</label>
+                        <input type="number" class="form-input" id="growthRate" placeholder="5" value="5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Investment Period (Years)</label>
+                        <input type="number" class="form-input" id="investmentPeriod" placeholder="10" value="10">
+                    </div>
+                    <button class="calculate-btn" onclick="calculateDividends()">Calculate Dividend Income</button>
+                    <div id="dividendResults" class="result-section" style="display: none;">
+                        <h3 class="result-title">Dividend Projections</h3>
+                        <div id="dividendResultsContent"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createRiskAssessment() {
+            return `
+                <div class="tool-form">
+                    <div class="form-group">
+                        <label class="form-label">Portfolio Value ($)</label>
+                        <input type="number" class="form-input" id="riskPortfolioValue" placeholder="100000" value="100000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Portfolio Beta</label>
+                        <input type="number" class="form-input" id="portfolioBeta" placeholder="1.2" value="1.2" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confidence Level (%)</label>
+                        <select class="form-select" id="confidenceLevel">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Time Horizon (Days)</label>
+                        <input type="number" class="form-input" id="timeHorizon" placeholder="1" value="1">
+                    </div>
+                    <button class="calculate-btn" onclick="calculateRisk()">Assess Risk</button>
+                    <div id="riskResults" class="result-section" style="display: none;">
+                        <h3 class="result-title">Risk Analysis</h3>
+                        <div id="riskResultsContent"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createRetirementPlanner() {
+            return `
+                <div class="tool-form">
+                    <div class="form-group">
+                        <label class="form-label">Current Age</label>
+                        <input type="number" class="form-input" id="currentAge" placeholder="30" value="30">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Retirement Age</label>
+                        <input type="number" class="form-input" id="retirementAge" placeholder="65" value="65">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Current Savings ($)</label>
+                        <input type="number" class="form-input" id="currentSavings" placeholder="50000" value="50000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Monthly Contribution ($)</label>
+                        <input type="number" class="form-input" id="monthlyContribution" placeholder="500" value="500">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Expected Annual Return (%)</label>
+                        <input type="number" class="form-input" id="annualReturn" placeholder="7" value="7" step="0.1">
+                    </div>
+                    <button class="calculate-btn" onclick="calculateRetirement()">Plan Retirement</button>
+                    <div id="retirementResults" class="result-section" style="display: none;">
+                        <h3 class="result-title">Retirement Projections</h3>
+                        <div id="retirementResultsContent"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createTaxOptimizer() {
+            return `
+                <div class="tool-form">
+                    <div class="form-group">
+                        <label class="form-label">Annual Income ($)</label>
+                        <input type="number" class="form-input" id="annualIncome" placeholder="75000" value="75000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tax Bracket (%)</label>
+                        <select class="form-select" id="taxBracket">
+                            <option value="12">12%</option>
+                            <option value="22" selected>22%</option>
+                            <option value="24">24%</option>
+                            <option value="32">32%</option>
+                            <option value="35">35%</option>
+                            <option value="37">37%</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Investment Amount ($)</label>
+                        <input type="number" class="form-input" id="investmentAmount" placeholder="10000" value="10000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Account Type</label>
+                        <select class="form-select" id="accountType">
+                            <option value="taxable">Taxable Account</option>
+                            <option value="traditional">Traditional IRA/401k</option>
+                            <option value="roth">Roth IRA/401k</option>
+                        </select>
+                    </div>
+                    <button class="calculate-btn" onclick="calculateTaxOptimization()">Optimize Taxes</button>
+                    <div id="taxResults" class="result-section" style="display: none;">
+                        <h3 class="result-title">Tax Optimization</h3>
+                        <div id="taxResultsContent"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Calculation functions
+        function calculatePortfolioAnalysis() {
+            const portfolioValue = parseFloat(document.getElementById('portfolioValue').value);
+            const riskTolerance = document.getElementById('riskTolerance').value;
+            const investmentHorizon = parseFloat(document.getElementById('investmentHorizon').value);
+            
+            // Simple portfolio analysis calculations
+            const riskMultipliers = { conservative: 0.6, moderate: 1.0, aggressive: 1.4 };
+            const expectedReturn = (5 + (riskMultipliers[riskTolerance] * 3)) / 100;
+            const volatility = riskMultipliers[riskTolerance] * 15;
+            const futureValue = portfolioValue * Math.pow(1 + expectedReturn, investmentHorizon);
+            const totalGain = futureValue - portfolioValue;
+            
+            const resultsDiv = document.getElementById('portfolioResults');
+            const resultsContent = document.getElementById('portfolioResultsContent');
+            
+            resultsContent.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Expected Annual Return</span>
+                    <span class="result-value">${(expectedReturn * 100).toFixed(1)}%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Portfolio Volatility</span>
+                    <span class="result-value">${volatility.toFixed(1)}%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Future Value (${investmentHorizon} years)</span>
+                    <span class="result-value">$${futureValue.toLocaleString('en-US', {maximumFractionDigits: 0})}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Projected Gain</span>
+                    <span class="result-value">$${totalGain.toLocaleString('en-US', {maximumFractionDigits: 0})}</span>
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        function calculateOptions() {
+            const stockPrice = parseFloat(document.getElementById('stockPrice').value);
+            const strikePrice = parseFloat(document.getElementById('strikePrice').value);
+            const daysToExpiration = parseFloat(document.getElementById('daysToExpiration').value);
+            const volatility = parseFloat(document.getElementById('volatility').value) / 100;
+            const optionType = document.getElementById('optionType').value;
+            
+            // Simplified Black-Scholes approximation
+            const timeToExpiration = daysToExpiration / 365;
+            const riskFreeRate = 0.05; // 5% risk-free rate
+            
+            const d1 = (Math.log(stockPrice / strikePrice) + (riskFreeRate + 0.5 * volatility * volatility) * timeToExpiration) / (volatility * Math.sqrt(timeToExpiration));
+            const d2 = d1 - volatility * Math.sqrt(timeToExpiration);
+            
+            // Simplified normal distribution approximation
+            const N = (x) => 0.5 * (1 + Math.sign(x) * Math.sqrt(1 - Math.exp(-2 * x * x / Math.PI)));
+            
+            let optionPrice;
+            if (optionType === 'call') {
+                optionPrice = stockPrice * N(d1) - strikePrice * Math.exp(-riskFreeRate * timeToExpiration) * N(d2);
+            } else {
+                optionPrice = strikePrice * Math.exp(-riskFreeRate * timeToExpiration) * N(-d2) - stockPrice * N(-d1);
+            }
+            
+            const intrinsicValue = optionType === 'call' ? Math.max(0, stockPrice - strikePrice) : Math.max(0, strikePrice - stockPrice);
+            const timeValue = optionPrice - intrinsicValue;
+            const delta = optionType === 'call' ? N(d1) : N(d1) - 1;
+            
+            const resultsDiv = document.getElementById('optionsResults');
+            const resultsContent = document.getElementById('optionsResultsContent');
+            
+            resultsContent.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Option Price</span>
+                    <span class="result-value">$${optionPrice.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Intrinsic Value</span>
+                    <span class="result-value">$${intrinsicValue.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Time Value</span>
+                    <span class="result-value">$${timeValue.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Delta</span>
+                    <span class="result-value">${delta.toFixed(3)}</span>
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        function calculateDividends() {
+            const numShares = parseFloat(document.getElementById('numShares').value);
+            const dividendPerShare = parseFloat(document.getElementById('dividendPerShare').value);
+            const growthRate = parseFloat(document.getElementById('growthRate').value) / 100;
+            const investmentPeriod = parseFloat(document.getElementById('investmentPeriod').value);
+            
+            const currentAnnualDividend = numShares * dividendPerShare * 4; // Quarterly dividends
+            const futureAnnualDividend = currentAnnualDividend * Math.pow(1 + growthRate, investmentPeriod);
+            
+            // Calculate total dividends over the period
+            let totalDividends = 0;
+            for (let year = 1; year <= investmentPeriod; year++) {
+                totalDividends += currentAnnualDividend * Math.pow(1 + growthRate, year - 1);
+            }
+            
+            const resultsDiv = document.getElementById('dividendResults');
+            const resultsContent = document.getElementById('dividendResultsContent');
+            
+            resultsContent.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Current Annual Dividend</span>
+                    <span class="result-value">$${currentAnnualDividend.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Future Annual Dividend (Year ${investmentPeriod})</span>
+                    <span class="result-value">$${futureAnnualDividend.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Dividends (${investmentPeriod} years)</span>
+                    <span class="result-value">$${totalDividends.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Dividend Growth</span>
+                    <span class="result-value">${((futureAnnualDividend / currentAnnualDividend - 1) * 100).toFixed(1)}%</span>
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        function calculateRisk() {
+            const portfolioValue = parseFloat(document.getElementById('riskPortfolioValue').value);
+            const portfolioBeta = parseFloat(document.getElementById('portfolioBeta').value);
+            const confidenceLevel = parseFloat(document.getElementById('confidenceLevel').value);
+            const timeHorizon = parseFloat(document.getElementById('timeHorizon').value);
+            
+            // Simplified VaR calculation
+            const marketVolatility = 0.16; // 16% annual market volatility
+            const portfolioVolatility = portfolioBeta * marketVolatility;
+            const dailyVolatility = portfolioVolatility / Math.sqrt(252); // 252 trading days
+            
+            // Z-scores for confidence levels
+            const zScores = { 90: 1.28, 95: 1.65, 99: 2.33 };
+            const zScore = zScores[confidenceLevel];
+            
+            const var1Day = portfolioValue * zScore * dailyVolatility * Math.sqrt(timeHorizon);
+            const expectedShortfall = var1Day * 1.3; // Simplified ES calculation
+            
+            const resultsDiv = document.getElementById('riskResults');
+            const resultsContent = document.getElementById('riskResultsContent');
+            
+            resultsContent.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Portfolio Volatility</span>
+                    <span class="result-value">${(portfolioVolatility * 100).toFixed(1)}%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Value at Risk (${confidenceLevel}%)</span>
+                    <span class="result-value">$${var1Day.toLocaleString('en-US', {maximumFractionDigits: 0})}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Expected Shortfall</span>
+                    <span class="result-value">$${expectedShortfall.toLocaleString('en-US', {maximumFractionDigits: 0})}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Risk Level</span>
+                    <span class="result-value">${portfolioBeta > 1.2 ? 'High' : portfolioBeta > 0.8 ? 'Moderate' : 'Low'}</span>
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        function calculateRetirement() {
+            const currentAge = parseFloat(document.getElementById('currentAge').value);
+            const retirementAge = parseFloat(document.getElementById('retirementAge').value);
+            const currentSavings = parseFloat(document.getElementById('currentSavings').value);
+            const monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value);
+            const annualReturn = parseFloat(document.getElementById('annualReturn').value) / 100;
+            
+            const yearsToRetirement = retirementAge - currentAge;
+            const monthlyReturn = annualReturn / 12;
+            const totalMonths = yearsToRetirement * 12;
+            
+            // Future value of current savings
+            const futureValueCurrentSavings = currentSavings * Math.pow(1 + annualReturn, yearsToRetirement);
+            
+            // Future value of monthly contributions (annuity)
+            const futureValueContributions = monthlyContribution * (Math.pow(1 + monthlyReturn, totalMonths) - 1) / monthlyReturn;
+            
+            const totalRetirementSavings = futureValueCurrentSavings + futureValueContributions;
+            const totalContributions = monthlyContribution * totalMonths;
+            const totalGrowth = totalRetirementSavings - currentSavings - totalContributions;
+            
+            const resultsDiv = document.getElementById('retirementResults');
+            const resultsContent = document.getElementById('retirementResultsContent');
+            
+            resultsContent.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Years to Retirement</span>
+                    <span class="result-value">${yearsToRetirement} years</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Retirement Savings</span>
+                    <span class="result-value">$${totalRetirementSavings.toLocaleString('en-US', {maximumFractionDigits: 0})}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Contributions</span>
+                    <span class="result-value">$${(currentSavings + totalContributions).toLocaleString('en-US', {maximumFractionDigits: 0})}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Investment Growth</span>
+                    <span class="result-value">$${totalGrowth.toLocaleString('en-US', {maximumFractionDigits: 0})}</span>
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        function calculateTaxOptimization() {
+            const annualIncome = parseFloat(document.getElementById('annualIncome').value);
+            const taxBracket = parseFloat(document.getElementById('taxBracket').value) / 100;
+            const investmentAmount = parseFloat(document.getElementById('investmentAmount').value);
+            const accountType = document.getElementById('accountType').value;
+            
+            let taxSavings = 0;
+            let afterTaxInvestment = investmentAmount;
+            let recommendation = '';
+            
+            switch(accountType) {
+                case 'traditional':
+                    taxSavings = investmentAmount * taxBracket;
+                    afterTaxInvestment = investmentAmount;
+                    recommendation = 'Immediate tax deduction, taxed on withdrawal';
+                    break;
+                case 'roth':
+                    taxSavings = 0;
+                    afterTaxInvestment = investmentAmount * (1 - taxBracket);
+                    recommendation = 'No immediate deduction, tax-free withdrawals in retirement';
+                    break;
+                case 'taxable':
+                    taxSavings = 0;
+                    afterTaxInvestment = investmentAmount * (1 - taxBracket);
+                    recommendation = 'No tax benefits, but more flexibility';
+                    break;
+            }
+            
+            const effectiveRate = (investmentAmount - afterTaxInvestment) / investmentAmount * 100;
+            
+            const resultsDiv = document.getElementById('taxResults');
+            const resultsContent = document.getElementById('taxResultsContent');
+            
+            resultsContent.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Immediate Tax Savings</span>
+                    <span class="result-value">$${taxSavings.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">After-Tax Investment</span>
+                    <span class="result-value">$${afterTaxInvestment.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Effective Tax Rate</span>
+                    <span class="result-value">${effectiveRate.toFixed(1)}%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Recommendation</span>
+                    <span class="result-value" style="font-size: 0.8rem;">${recommendation}</span>
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        // Form submission handler
+        document.getElementById('stockForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const symbol = document.getElementById('stockSymbol').value.toUpperCase().trim();
+            const searchBtn = document.getElementById('searchBtn');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorContainer = document.getElementById('errorContainer');
+            
+            if (!symbol) {
+                showError('Please enter a stock symbol');
+                return;
+            }
+
+            // Show loading state
+            searchBtn.disabled = true;
+            searchBtn.textContent = 'Loading...';
+            loadingIndicator.style.display = 'block';
+            errorContainer.innerHTML = '';
+
+            try {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1200));
+                
+                const stockData = await fetchStockData(symbol);
+                displayStockData(stockData);
+                createChart(stockData);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                // Reset loading state
+                searchBtn.disabled = false;
+                searchBtn.textContent = 'Get Quote';
+                loadingIndicator.style.display = 'none';
+            }
+        });
+
+        // Simulate fetching stock data
+        async function fetchStockData(symbol) {
+            if (sampleStockData[symbol]) {
+                return sampleStockData[symbol];
+            } else {
+                throw new Error(`Symbol "${symbol}" not found. Available symbols: AAPL, TSLA, GOOGL, MSFT, AMZN`);
+            }
+        }
+
+        // Display comprehensive stock data
+        function displayStockData(data) {
+            const container = document.getElementById('stockContainer');
+            const isPositive = data.change >= 0;
+            const changeClass = isPositive ? 'positive' : 'negative';
+            const changeSymbol = isPositive ? '+' : '';
+            const arrow = isPositive ? '▲' : '▼';
+
+            container.innerHTML = `
+                <div class="stock-overview">
+                    <div class="stock-main">
+                        <div class="stock-header">
+                            <div class="stock-info">
+                                <h2>${data.symbol}</h2>
+                                <div class="stock-name">${data.name}</div>
+                                <div class="stock-exchange">${data.exchange}</div>
+                            </div>
+                            <div class="stock-price-section">
+                                <div class="stock-price ${changeClass}">$${data.price.toFixed(2)}</div>
+                                <div class="stock-change ${changeClass}">
+                                    <span class="change-arrow">${arrow}</span>
+                                    ${changeSymbol}$${Math.abs(data.change).toFixed(2)} (${changeSymbol}${data.changePercent.toFixed(2)}%)
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stock-metrics">
+                            <div class="metric">
+                                <div class="metric-label">Open</div>
+                                <div class="metric-value">$${data.open.toFixed(2)}</div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">High</div>
+                                <div class="metric-value">$${data.high.toFixed(2)}</div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">Low</div>
+                                <div class="metric-value">$${data.low.toFixed(2)}</div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">Volume</div>
+                                <div class="metric-value">${formatVolume(data.volume)}</div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">Avg Volume</div>
+                                <div class="metric-value">${formatVolume(data.avgVolume)}</div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">Prev Close</div>
+                                <div class="metric-value">$${data.previousClose.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stock-sidebar">
+                        <div class="sidebar-card">
+                            <h3 class="sidebar-title">Key Statistics</h3>
+                            <div class="key-stats">
+                                <div class="stat-row">
+                                    <span class="stat-label">Market Cap</span>
+                                    <span class="stat-value">${formatMarketCap(data.marketCap)}</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">P/E Ratio</span>
+                                    <span class="stat-value">${data.peRatio.toFixed(2)}</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">EPS</span>
+                                    <span class="stat-value">$${data.eps.toFixed(2)}</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Dividend</span>
+                                    <span class="stat-value">${data.dividend > 0 ? '$' + data.dividend.toFixed(2) : 'N/A'}</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Yield</span>
+                                    <span class="stat-value">${data.yield > 0 ? data.yield.toFixed(2) + '%' : 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="sidebar-card">
+                            <h3 class="sidebar-title">52-Week Range</h3>
+                            <div class="key-stats">
+                                <div class="stat-row">
+                                    <span class="stat-label">52W High</span>
+                                    <span class="stat-value">$${data.week52High.toFixed(2)}</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">52W Low</span>
+                                    <span class="stat-value">$${data.week52Low.toFixed(2)}</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">From High</span>
+                                    <span class="stat-value ${data.price < data.week52High ? 'negative' : 'positive'}">
+                                        ${(((data.price - data.week52High) / data.week52High) * 100).toFixed(1)}%
+                                    </span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">From Low</span>
+                                    <span class="stat-value positive">
+                                        +${(((data.price - data.week52Low) / data.week52Low) * 100).toFixed(1)}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create professional stock chart
+        function createChart(data) {
+            const container = document.getElementById('chartContainer');
+            const now = new Date();
+            
+            container.innerHTML = `
+                <div class="chart-section">
+                    <div class="chart-header">
+                        <div class="chart-title">${data.symbol} Price Chart</div>
+                        <div class="chart-controls">
+                            <button class="time-btn active">1D</button>
+                            <button class="time-btn">5D</button>
+                            <button class="time-btn">1M</button>
+                            <button class="time-btn">3M</button>
+                            <button class="time-btn">1Y</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="stockChart"></canvas>
+                    </div>
+                    <div class="last-updated">
+                        Last updated: ${now.toLocaleString()} EST
+                    </div>
+                </div>
+            `;
+
+            // Generate sample price data for the chart
+            const priceData = generateSamplePriceData(data);
+            
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            const chartColor = data.change >= 0 ? '#48bb78' : '#f56565';
+            gradient.addColorStop(0, chartColor + '40');
+            gradient.addColorStop(1, chartColor + '00');
+            
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: priceData.labels,
+                    datasets: [{
+                        label: `${data.symbol} Price`,
+                        data: priceData.prices,
+                        borderColor: chartColor,
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.1,
+                        pointBackgroundColor: chartColor,
+                        pointBorderColor: '#1a202c',
+                        pointBorderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: chartColor,
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: '#4a5568',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#a0aec0',
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#4a5568',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#a0aec0',
+                                font: {
+                                    size: 11
+                                },
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    elements: {
+                        point: {
+                            hoverBackgroundColor: '#ffffff'
+                        }
+                    }
+                }
+            });
+
+            // Add time period button functionality
+            const timeButtons = container.querySelectorAll('.time-btn');
+            timeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    timeButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update chart with new time period data
+                    const period = this.textContent;
+                    updateChartData(data, period);
+                });
+            });
+        }
+
+        // Generate realistic sample price data
+        function generateSamplePriceData(stockData, period = '1D') {
+            const labels = [];
+            const prices = [];
+            const currentPrice = stockData.price;
+            const volatility = currentPrice * 0.015; // 1.5% volatility
+            
+            let dataPoints, timeInterval, labelFormat;
+            
+            switch(period) {
+                case '1D':
+                    dataPoints = 50;
+                    timeInterval = 8; // 8-minute intervals
+                    labelFormat = 'time';
+                    break;
+                case '5D':
+                    dataPoints = 25;
+                    timeInterval = 60 * 4; // 4-hour intervals
+                    labelFormat = 'datetime';
+                    break;
+                case '1M':
+                    dataPoints = 30;
+                    timeInterval = 60 * 24; // Daily intervals
+                    labelFormat = 'date';
+                    break;
+                case '3M':
+                    dataPoints = 45;
+                    timeInterval = 60 * 24 * 2; // 2-day intervals
+                    labelFormat = 'date';
+                    break;
+                case '1Y':
+                    dataPoints = 52;
+                    timeInterval = 60 * 24 * 7; // Weekly intervals
+                    labelFormat = 'date';
+                    break;
+                default:
+                    dataPoints = 50;
+                    timeInterval = 8;
+                    labelFormat = 'time';
+            }
+            
+            // Generate data points
+            for (let i = dataPoints - 1; i >= 0; i--) {
+                const time = new Date();
+                time.setMinutes(time.getMinutes() - i * timeInterval);
+                
+                // Format labels based on time period
+                let label;
+                switch(labelFormat) {
+                    case 'time':
+                        label = time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        break;
+                    case 'datetime':
+                        label = time.toLocaleDateString([], {month: 'short', day: 'numeric'}) + ' ' + 
+                               time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        break;
+                    case 'date':
+                        label = time.toLocaleDateString([], {month: 'short', day: 'numeric'});
+                        break;
+                }
+                labels.push(label);
+                
+                // Generate realistic price movement with trend
+                const trendFactor = (stockData.change / stockData.previousClose) * (i / dataPoints);
+                const randomChange = (Math.random() - 0.5) * volatility * (period === '1Y' ? 3 : period === '3M' ? 2 : 1);
+                const basePrice = stockData.previousClose + (stockData.change * (1 - i / dataPoints));
+                prices.push(Math.max(0, basePrice + randomChange + (trendFactor * currentPrice)));
+            }
+            
+            // Ensure the last price matches the current price
+            prices[prices.length - 1] = currentPrice;
+            
+            return { labels, prices };
+        }
+
+        // Update chart with new time period data
+        function updateChartData(stockData, period) {
+            if (!currentChart) return;
+            
+            const newData = generateSamplePriceData(stockData, period);
+            
+            // Update chart data
+            currentChart.data.labels = newData.labels;
+            currentChart.data.datasets[0].data = newData.prices;
+            
+            // Update chart animation
+            currentChart.update('active');
+        }
+
+        // Format large numbers
+        function formatVolume(volume) {
+            if (volume >= 1000000000) {
+                return (volume / 1000000000).toFixed(1) + 'B';
+            } else if (volume >= 1000000) {
+                return (volume / 1000000).toFixed(1) + 'M';
+            } else if (volume >= 1000) {
+                return (volume / 1000).toFixed(1) + 'K';
+            }
+            return volume.toString();
+        }
+
+        function formatMarketCap(marketCap) {
+            if (marketCap >= 1e12) {
+                return '$' + (marketCap / 1e12).toFixed(2) + 'T';
+            } else if (marketCap >= 1e9) {
+                return '$' + (marketCap / 1e9).toFixed(1) + 'B';
+            } else if (marketCap >= 1e6) {
+                return '$' + (marketCap / 1e6).toFixed(1) + 'M';
+            }
+            return '$' + marketCap.toString();
+        }
+
+        // Show error messages
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = `
+                <div class="error-message">
+                    ⚠️ ${message}
+                </div>
+            `;
+            
+            // Clear error after 5 seconds
+            setTimeout(() => {
+                errorContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('toolModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing...');
+            
+            // Initialize navigation system
+            initializeNavigation();
+            
+            // Load default stock data
+            document.getElementById('stockSymbol').value = 'AAPL';
+            document.getElementById('stockForm').dispatchEvent(new Event('submit'));
+            
+            console.log('Initialization complete');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97f8c5bcc4badc57',t:'MTc1Nzk0NjEwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
